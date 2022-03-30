@@ -8,7 +8,6 @@ using namespace std;
 
 typedef enum couleur_t
 {
-    vide,
     blanc,
     noir
 }couleur_t;
@@ -16,128 +15,201 @@ typedef enum couleur_t
 class Piece
 {
     private:
-        string nom;
-        int couleur;
+
+        couleur_t couleur;
+        string representation; 
+        int position_i;
+        int position_j;
     
     public:
+        Piece(couleur_t couleur, string repr, int i, int j): couleur(couleur), representation(repr), position_i(i), position_j(j){};
+        ~Piece();
 
         void affiche() const
         {
-            cout<<nom<<endl;
+            cout<<representation<<endl;
         }
 
-        //affiche un message d'erreur temps que le coup saisis est hors plateau
-        void traitement_saisie(string *string_position_ptr)
+        //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
+        virtual bool test_mouvement_piece(vector<int> int_destination) const =0;
+     
+       
+
+        //affiche un message d'erreur tant que le coup saisi est impossible à effectué par la pièce en question
+        //le bool renvoyé est égal à true si il a fallu modifier string_coup pour terminer le traitement
+        bool traitement_destination_coup(string &string_coup) const 
         {
+            //cette variable sert à savor si le joueur a dû saisir un nouveau coup car celui tapé n'était pas valide
+            bool modif_string_coup= false;
+
             int termine=0;
             while(!termine)
             {
-                bool correcte= Jeu::test_hors_plateau(string_position_ptr);
-                if(correcte= true)
+                //on convertie le string_coup en int_coup 
+                vector<vector<int>> int_coord_coup= Square::string_to_int_coord(string_coup);
+
+                //on extrait les coordonnées en int de la destination du coup
+                vector<int> int_destination= Square::get_destination(int_coord_coup);
+
+                int jouable= test_mouvement_piece(int_destination);
+
+                if(jouable== true)
                 {
-                    continue;
+                    termine= 1;
                 }
-                else
+                else 
                 {
-                    cout<< "Ça ne correspond à aucune position de l'echiquier, veuillez réessayer\n"<< endl;
-                    cin>> *string_position_ptr;
-                    continue;
-                }
-                termine= 1;
-            
+                    modif_string_coup= true;
+
+                    cout<< "Cette pièce n'est pas capable de se déplacer ainsi, veuillez taper une destination valide\n"<< endl;
+                    cin>> string_coup;
+                } 
+                  
             }
+
+            return modif_string_coup;
         }
-
-        //retourne l'ensemble des positions accessibles à une piece
-        virtual vector<string> calcul_coups_possibles(string string_position) const=0;
-
-        //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
-        virtual bool test_mouvement_piece(string string_position) const =0;
-
-        //affiche un message d'erreur tant que le coup saisi est impossible à effectué par la pièce en question
-        string traitement_coup(string *string_position_ptr) const =0;
-
-        //demande où est ce que le joueur veux jouer, et enregistre les coordonnées saisies
-        virtual vector<int> ou_jouer() const =0;
-
-        
-       
-
         
 };
 
-class pion: public Piece
+class Pion: public Piece
 {
     private:
 
     public:
-        //retourne l'ensemble des positions accessibles à une piece
-        virtual vector<vector<int>> calcul_coups_possibles(string string_position)
-        {
-            //conversion string string_pos-> int_pos vect<int>
-            //if blanc:
-                        //ajouter 1 dans le bon sens à la coord y
-                        //voir 2 si premier coup
-                        //voir diagos si piece à bouffer
-                        //voir prise en passant
-            //if noir :
-                        //ajouter 1 dans le bon sens à la coord y
-                        //voir 2 si premier coup
-                        //voir diagos si piece à bouffer
-                        //voir prise en passant
 
-        }
-
+        Pion(couleur_t couleur, string repr, int i, int j): Piece(couleur ,repr, i, j){};
+        ~Pion();
         //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
-        virtual bool test_mouvement_piece(string string_position) const 
+        bool test_mouvement_piece(vector<int> int_destination) const override
         {
-            
-            
-            vector<vector<int>> coups_possibles= calcul_coups_possibles(string_position);
+            //grille= get_grille();
 
-            //for tout les coups_possibles:
-            //comparer
-        }
-        
-
-
-        virtual vector<int> ou_jouer() const
-        {
-            cout<< "où voulez vous jouer?\n";
-            string string_position;
-            cin>> string_position;
-
-            traitement_saisie(string_position);
-
-            traitement_coup()
-            
-            
-
-                return n;
-            }
-        }
-
-        virtual string traitement_coup(string *string_position_ptr) const 
-        {
-            bool jouable= test_mouvement_piece(*string_position_ptr);
-
-            int termine=0;
-            while(!termine)
+            //les blancs commenceront toujours en bas du plateau, les noir en haut
+            if (couleur== noir)
             {
-                if(jouable= true)
-                {
-                    continue;
-                }
-                else
-                {
-                    cout<< "Cette pièce n'est pas capable de se déplacer ainsi, veuillez taper une destination valide \n"<< endl;
-                    cin>> *string_position_ptr;
-                    continue;
-                }
-                termine= 1;
                 
+                //tester si int_destination== (x, y-1)
+                //voir (x, y-2) si premier coup
+                //voir (x-1,y-1) et/ou (x+1,y-1) si le pion peut bouffer des pieces
+                //voir prise en passant
+
+                //return true si oui, false si non
+            }
+                        
+            if (couleur== blanc)
+            {
+                //tester si int_destination== (x, y+1)
+                //voir (x, y+2) si premier coup
+                //voir (x+1,y+1) et/ou (x-1,y+1) si le pion peut bouffer des pieces
+                //voir prise en passant
+
+                //return true si oui, false si non
             }
         }
+};
 
-}
+
+class Tour: public Piece
+{
+    private:
+        
+    public:
+        //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
+        bool test_mouvement_piece(vector<int> int_destination) const override
+        {
+            //grille= get_grille();
+
+            //conversion string string_pos-> int_pos vect<int>
+            
+            //voir si int_destination est du type (x, y+ou-n) tq -1<y+ou-n<9 et (x+ou-n, y) tq -1<x+ou-n<9
+
+            //return true si c'est le cas, false si non
+        }     
+};
+
+
+class Cheval: public Piece
+{
+    private:
+        
+    public:
+        //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
+        bool test_mouvement_piece(vector<int> int_destination) const override
+        {
+            //grille= get_grille();
+
+            
+         
+            //voir si int_destination est du type (x+ou-1, y+ou-2) tq -1>x+ou-1>9 et -1>y+ou-2>9 et (x+ou-2, y+ou-1) tq -1>x+ou-2>9 et -1>y+ou-1>9 
+
+            //return true si oui, false si non
+           
+
+        }     
+};
+
+class Fou: public Piece
+{
+    private:
+        
+    public:
+        //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
+        bool test_mouvement_piece(vector<int> int_destination) const override
+        {
+            //grille= get_grille();
+            
+            bool coup_jouable= true;
+            
+            //voir si int_destination est du type (x+n, y+n), (x-n, y-n), (x+n, y-n), (x-n, y+n) tq les expresion des coord sont entre 0 et 8 inclus
+                coup_jouable= false;
+            
+
+            //return true si oui, false si non
+           
+
+        }     
+};
+
+class Reine: public Piece
+{
+    private:
+        
+    public:
+        //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
+        bool test_mouvement_piece(vector<int> int_destination) const override
+        {
+            //grille= get_grille();
+            
+            
+            //voir si int_destination est du type (x+n, y+n), (x-n, y-n), (x+n, y-n), (x-n, y+n) tq les expresion des coord sont entre 0 et 8 inclus
+            //ou du type (x, y+ou-n) tq -1<y+ou-n<9 et (x+ou-n, y) tq -1<x+ou-n<9
+                        
+            //rtn true si oui, false si non
+
+        }    
+};
+
+class Roi: public Piece
+{
+    private:
+        
+    public:
+        //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
+        bool test_mouvement_piece(vector<int> int_destination) const override
+        {
+            //grille= get_grille();
+            
+            
+            //voir si int_destination est du type (x+1, y+1), (x-1, y-1), (x+1, y-1), (x-1, y+1) tq les expresion des coord sont entre 0 et 8 inclus
+            //ou du type (x, y+ou-1) tq -1<y+ou-1<9 et (x+ou-1, y) tq -1<x+ou-1<9
+
+            //rtn true si oui, false si non
+
+        }         
+};
+
+
+
+
 #endif
