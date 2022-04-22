@@ -1,8 +1,24 @@
  
 - pour colorier les pièces d'échec utilise les ANSI escape code
 
-- vers la fin du sujet y'a le code pour afficher l'echiquier etc...
-
 - Voir pour renommer les fonctions etc
 - Commenter le plus possible
 - revoir les commentaires
+
+-pas oublier de tt free à la fin 
+
+-Mettre les commentaires en dox dans les .h
+
+-remettre l'alternance blanc noir
+
+-voir pour mettre des const partout sur les arguments et les fonctions
+
+-tester
+//affiche la position de chaque piece en fin de partie selon l'affichage canonique
+void canonical_position() const; 
+
+//renvoie le code d'une pièce (ex: wK pour le roi blanc) à partir de sa représentation
+string pgn_piece_name(string const name, bool view_pawn, bool view_color) const;
+
+
+
