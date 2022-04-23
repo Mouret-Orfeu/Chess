@@ -130,7 +130,8 @@ void Pion::incr_nbr_de_coup()
 
 bool Pion::test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const
 {
-    cout<<representation<<endl;
+    //AFFICHAGE DEBUG
+    //cout<<representation<<endl;
     
     Piece*** grille= echiquier.get_grille();
 
@@ -273,7 +274,9 @@ bool Pion::test_mouvement_piece(vector<int> destination, vector<int> depart, Ech
 
 bool Tour::test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const
 {
-    cout<<representation<<endl;
+    //AFFICHAGE DEBUG
+    //cout<<representation<<endl;
+
     Piece*** grille= echiquier.get_grille();
             
     //voir si destination est du type (i, j+ou-n)
@@ -363,7 +366,9 @@ bool Cheval::test_mouvement_piece(vector<int> destination, vector<int> depart, E
 {
     (void)echiquier;
 
-    cout<<representation<<endl;
+    //AFFICHAGE DEBUG
+    //cout<<representation<<endl;
+    
     //Piece*** grille= echiquier.get_grille();
 
     //voir si destination est du type (i+ou-1, j+ou-2) 
@@ -508,7 +513,9 @@ bool Fou::test_mouvement_piece(vector<int> destination, vector<int> depart, Echi
 
 bool Reine::test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const
 {
-    cout<<representation<<endl;
+    //AFFICHAGE DEBUG
+    //cout<<representation<<endl;
+    
     Piece*** grille= echiquier.get_grille();
             
             
@@ -696,7 +703,9 @@ bool Reine::test_mouvement_piece(vector<int> destination, vector<int> depart, Ec
 
 bool Roi::test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const
 {
+    //AFFICHAGE DEBUG
     cout<<representation<<endl;
+    
     //Piece*** grille= echiquier.get_grille();
             
     //voir si destination est du type de celui d'une Tour, avec des déplacements d'une seule case
@@ -725,7 +734,6 @@ bool Roi::test_mouvement_piece(vector<int> destination, vector<int> depart, Echi
             return true;
     }
 
-    //auto-echec?
 
     //Si on est rentré dans aucun des cas au dessus, c'est que le mouvement n'est pas valide et on renvoie false
     return false;

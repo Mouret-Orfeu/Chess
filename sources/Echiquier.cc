@@ -372,7 +372,7 @@ void Echiquier::canonical_position() const
     cout<<output<<endl;
 }
 
-bool Echiquier::test_echec(couleur_t couleur_Roi, Echiquier &echiquier)
+bool Echiquier::test_echec(couleur_t couleur_Roi, Echiquier &echiquier) const
 {
     Piece *roi_ptr;
     Piece **pieces_adverses;
@@ -388,7 +388,7 @@ bool Echiquier::test_echec(couleur_t couleur_Roi, Echiquier &echiquier)
         
     }
         
-    else if(couleur_Roi== noir)
+    else 
     {
         roi_ptr= piecesn[4];
         pions_adverses = pionsb;
@@ -396,20 +396,53 @@ bool Echiquier::test_echec(couleur_t couleur_Roi, Echiquier &echiquier)
     }
 
     vector<int> destination= roi_ptr->get_pos();
+
+    //AFFICHAGE DEBUG
+    int i_r= destination[0];
+    int j_r= destination[1];
+    cout<<"position du roi blanc: "<<i_r<<","<<j_r<<endl;
+
     vector<int> depart;
+
+    //AFFICHAGE DEBUG
+    string repr;
 
     //On va tester pour chaque piece adverse, si elle peut se déplacer sur la case du roi
     for(int k=0; k<NBCOL; k++)
     {
         depart= pieces_adverses[k]->get_pos();
+        
+        //AFFICHAGE DEBUG
+        repr= pieces_adverses[k]->get_repre();
 
         if(pieces_adverses[k]->test_mouvement_piece(destination, depart, echiquier)== true)
+        { 
+            //AFFICHAGE DEBUG
+            cout<<"piece qui met en echec: "<<repr<<endl;
+            int i_p= depart[0];
+            int j_p= depart[1];
+            cout<<"position piece qui met en echec: "<<i_p<<","<<j_p<<endl;
+
+
             return true;
+        }
 
         depart= pions_adverses[k]->get_pos();
 
+        //AFFICHAGE DEBUG
+        repr= pions_adverses[k]->get_repre();
+
         if(pions_adverses[k]->test_mouvement_piece(destination, depart, echiquier)== true)
+        {
+            //AFFICHAGE DEBUG
+            cout<<"piece qui met en echec: "<<repr<<endl;
+            int i_p= depart[0];
+            int j_p= depart[1];
+            cout<<"position piece qui met en echec: "<<i_p<<","<<j_p<<endl;
+
             return true;
+        }
+           
     }
 
     return false;  

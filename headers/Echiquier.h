@@ -69,14 +69,17 @@ class Echiquier
         //renvoie le code d'une pièce (ex: wK pour le roi blanc) à partir de sa représentation
         string pgn_piece_name(string const name, bool view_pawn, bool view_color) const;
 
+        /*Dans certaines méthodes d'Echiquier, j'ai passé en argument l'objet de la méthode. 
+        Je sais que je peux faire sans mais je préfère manipuler des &Echiquier et l'utilisation de "this" dans mes fonctions m'oblige à utiliser des const Echiquier**/
+
         //prend la couleur d'un Roi, et retourne true s'il est en echec, false si non
-        bool test_echec(couleur_t couleur_Roi, Echiquier &echiquier);
+        bool test_echec(couleur_t couleur_Roi, Echiquier &echiquier) const;
 
         //gère la prise en passant 
-        void Echiquier::gerer_prise_en_passant(string repr_piece, vector<int> depart, vector<int> destination, vector<int> coord_pion_noir_vient_d_etre_jouer, vector<int> coord_pion_blanc_vient_d_etre_jouer, Piece*** grille, Piece* piece_ptr, couleur_t couleur);
+        void gerer_prise_en_passant(string repr_piece, vector<int> depart, vector<int> destination, vector<int> coord_pion_noir_vient_d_etre_jouer, vector<int> coord_pion_blanc_vient_d_etre_jouer, Piece*** grille, Piece* piece_ptr, couleur_t couleur);
 
         //effectue les modifications dans la grille de l'échiquier, conformément au coup voulue
-        void Echiquier::deplacement_piece(vector<int> destination, vector<int> depart, Piece ***grille, Piece *piece_ptr);
+        void deplacement_piece(vector<int> destination, vector<int> depart, Piece ***grille, Piece *piece_ptr);
 
         //affiche un message quand un joueur met en echec son adversaire
         void affiche_message_echec(couleur_t couleur_joueur, Echiquier &echiquier);

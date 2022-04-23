@@ -190,7 +190,7 @@ Coup Jeu::demander_coup(Echiquier &echiquier, couleur_t couleur_joueur) const
             continue;
 
 
-        modif_coup=traitement_auto_echec(coup, couleur_joueur, echiquier);
+        modif_coup= traitement_auto_echec(coup, couleur_joueur, echiquier);
                 
         if(modif_coup== true)
             continue;
@@ -199,11 +199,11 @@ Coup Jeu::demander_coup(Echiquier &echiquier, couleur_t couleur_joueur) const
     return coup;
 }
 
-bool traitement_auto_echec(Coup &coup, couleur_t couleur_joueur, Echiquier &echiquier)
+bool Jeu::traitement_auto_echec(Coup &coup, couleur_t couleur_joueur, Echiquier &echiquier) const 
 {
     bool modif_string_coup= false;
 
-    bool jouable= echiquier.test_echec(couleur_joueur, echiquier);
+    bool jouable= !(echiquier.test_echec(couleur_joueur, echiquier));
   
     if(jouable== false) 
     {
