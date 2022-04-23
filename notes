@@ -20,5 +20,9 @@ void canonical_position() const;
 //renvoie le code d'une pièce (ex: wK pour le roi blanc) à partir de sa représentation
 string pgn_piece_name(string const name, bool view_pawn, bool view_color) const;
 
+-essayer d'enlever les arguments des méthodes qui répètent l'objet sur lequel est appliquée la méthode 
 
+-éclater les fonctions en plusieurs sous fonctions quand c'est possibe et pertinent
+
+-raccourcir les lignes trop longues
 

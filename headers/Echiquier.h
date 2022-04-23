@@ -56,7 +56,8 @@ class Echiquier
         
         //modifie l'échiquier conformément au coup valide saisi par le joueur
         //en effet à ce stade on a déjà vérifié qu'on peut jouer le coup
-        void joue_le_coup(Coup &coup);
+        //affiche un message si il y a mise en echec de l'adversaire
+        void joue_le_coup(Coup &coup, couleur_t couleur_joueur, Echiquier &echiquier);
         
 
         //une fois que la partie sera terminée, on free toutes les pièces qui restent (on aura free les pièces disparues dés leur désaparition)
@@ -67,6 +68,18 @@ class Echiquier
 
         //renvoie le code d'une pièce (ex: wK pour le roi blanc) à partir de sa représentation
         string pgn_piece_name(string const name, bool view_pawn, bool view_color) const;
+
+        //prend la couleur d'un Roi, et retourne true s'il est en echec, false si non
+        bool test_echec(couleur_t couleur_Roi, Echiquier &echiquier);
+
+        //gère la prise en passant 
+        void Echiquier::gerer_prise_en_passant(string repr_piece, vector<int> depart, vector<int> destination, vector<int> coord_pion_noir_vient_d_etre_jouer, vector<int> coord_pion_blanc_vient_d_etre_jouer, Piece*** grille, Piece* piece_ptr, couleur_t couleur);
+
+        //effectue les modifications dans la grille de l'échiquier, conformément au coup voulue
+        void Echiquier::deplacement_piece(vector<int> destination, vector<int> depart, Piece ***grille, Piece *piece_ptr);
+
+        //affiche un message quand un joueur met en echec son adversaire
+        void affiche_message_echec(couleur_t couleur_joueur, Echiquier &echiquier);
         
         
 };

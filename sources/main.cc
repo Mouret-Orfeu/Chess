@@ -5,7 +5,7 @@ using namespace std;
 
 
 
-//--------------------------------------------------------------
+/*****************************************************************************/
 int main() 
 {
 
@@ -18,11 +18,11 @@ int main()
     Jeu jeu;             //initialise le jeu 
     
     couleur_t couleur_du_joueur= blanc;
-    //int it=0;
-    
+    int it=0;
     
     bool stop(false);
     echiquier.affiche();
+    
     do
     {
         Coup coup= jeu.demander_coup(echiquier, couleur_du_joueur);
@@ -33,14 +33,14 @@ int main()
 
         if (string_coup!= "/quit") 
         {
-            echiquier.joue_le_coup(coup);
+            echiquier.joue_le_coup(coup, couleur_du_joueur, echiquier);
             echiquier.affiche();
 
-            //it++;
-            //if(it%2== 0)
-            //    couleur_du_joueur= blanc;
-            //else
-            //    couleur_du_joueur= noir;
+            it++;
+            if(it%2== 0)
+                couleur_du_joueur= blanc;
+            else
+                couleur_du_joueur= noir;
 
         }
         else stop=true;

@@ -76,7 +76,7 @@ Echiquier::Echiquier ()
     piecesn[0] = new Tour    (noir,"\u2656",  0, 0);
     piecesn[1] = new Cheval  (noir,"\u2658",  0, 1);
     piecesn[2] = new Fou     (noir,"\u2657",  0, 2);
-    piecesn[3] = new Reine   (noir,"\u2655",  3, 3);
+    piecesn[3] = new Reine   (noir,"\u2655",  0, 3);
     piecesn[4] = new Roi     (noir,"\u2654",  0, 4);
     piecesn[5] = new Fou     (noir,"\u2657",  0, 5);
     piecesn[6] = new Cheval  (noir,"\u2658",  0, 6);
@@ -85,7 +85,7 @@ Echiquier::Echiquier ()
     piecesb[1] = new Cheval  (blanc,"\u265E",  7, 1);
     piecesb[2] = new Fou     (blanc,"\u265D",  7, 2);
     piecesb[3] = new Reine   (blanc,"\u265B",  7, 3);
-    piecesb[4] = new Roi     (blanc,"\u265A",  2, 2);
+    piecesb[4] = new Roi     (blanc,"\u265A",  7, 4);
     piecesb[5] = new Fou     (blanc,"\u265D",  7, 5);
     piecesb[6] = new Cheval  (blanc,"\u265E",  7, 6);
     piecesb[7] = new Tour    (blanc,"\u265C",  7, 7);
@@ -93,16 +93,14 @@ Echiquier::Echiquier ()
     // allocation des pions
     for (int i=0; i<NBCOL; i++) 
     {
-        pionsb[i] =  new Pion(noir, "\u2659", 1,i);
-        pionsn[i] =  new Pion(blanc, "\u265F", 6,i);
+        pionsn[i] =  new Pion(noir, "\u2659", 1,i);
+        pionsb[i] =  new Pion(blanc, "\u265F", 6,i);
     }
 
     // Pose des pieces en position initiale
     // pose des pieces blanches
-    pose_piece(piecesn[3],piecesn[3]->get_pos());
-    pose_piece(piecesb[4],piecesb[4]->get_pos());
-    
-    /*for (int i=0; i<NBCOL; i++) 
+  
+    for (int i=0; i<NBCOL; i++) 
     {
         // met à jour le tableau grille, à la case donnée par 
         // la position courante de la pièce obtenue avec 
@@ -136,7 +134,7 @@ Echiquier::Echiquier ()
         //printf("pos pieces noir %d: %d , %d\n", i, pos_i_4, pos_j_4);
 
 
-    }*/
+    }
      
 }
 
@@ -179,7 +177,7 @@ void Echiquier::affiche () const
 
 
 
-void Echiquier::joue_le_coup(Coup &coup)
+void Echiquier::joue_le_coup(Coup &coup, couleur_t couleur_joueur, Echiquier &echiquier)
 {
     vector<vector<int>> int_coup= coup.string_to_int_coord();
             
@@ -187,20 +185,30 @@ void Echiquier::joue_le_coup(Coup &coup)
     vector<int> depart= coup.extract_coord_depart(int_coup);
     vector<int> destination= coup.extract_coord_destination(int_coup);
 
-    //on récupère l'adresse de la piece à bouger
+    //on récupère l'adresse de la piece à jouer
     Piece* piece_ptr= grille[depart[0]][depart[1]];
 
-
-
-
+    //on recupère la représentation de la piece à jouer, et sa couleur
     string repr_piece= piece_ptr->get_repre();
     couleur_t couleur= piece_ptr->get_couleur();
 
+    //AFFICHAGE DEBUG
     cout<<"AVANT: coord pion blanc vient de jouer : "<<coord_pion_blanc_vient_d_etre_jouer[0]<<" , "<<coord_pion_blanc_vient_d_etre_jouer[1]<<endl;
     cout<<"AVANT: coord pion noir vient de jouer : "<<coord_pion_noir_vient_d_etre_jouer[0]<<" , "<<coord_pion_noir_vient_d_etre_jouer[1]<<endl;
 
+    //gerer la prise en passant
+    gerer_prise_en_passant(repr_piece, depart, destination, coord_pion_noir_vient_d_etre_jouer, coord_pion_blanc_vient_d_etre_jouer, grille, piece_ptr, couleur);
 
-    //si la piece qu'on vient de jouer est un pion noir
+    //on modifie la grille de l'échiquier conformément au coup 
+    deplacement_piece(destination, depart, grille, piece_ptr);
+    
+    //message de echec mise en echec de l'adversaire
+    affiche_message_echec(couleur_joueur, echiquier);
+}
+
+void Echiquier::gerer_prise_en_passant(string repr_piece, vector<int> depart, vector<int> destination, vector<int> coord_pion_noir_vient_d_etre_jouer, vector<int> coord_pion_blanc_vient_d_etre_jouer, Piece*** grile, Piece* piece_ptr, couleur_t couleur)
+{
+      //si la piece qu'on vient de jouer est un pion noir
     if(repr_piece.compare("\u2659") ==0) 
     {
         //si le coup joué est une prise en passant
@@ -264,9 +272,10 @@ void Echiquier::joue_le_coup(Coup &coup)
             coord_pion_noir_vient_d_etre_jouer[1]= -1; 
         }
     }
+}
 
-    //on modifie la grille de l'échiquier conformément au coup 
-
+void Echiquier::deplacement_piece(vector<int> destination, vector<int> depart, Piece ***grille, Piece *piece_ptr)
+{
     //on met l'@ de piece jouée dans la case destination 
     grille[destination[0]][destination[1]]= piece_ptr;
     //on met NULL dans la case de départ du coup 
@@ -274,7 +283,25 @@ void Echiquier::joue_le_coup(Coup &coup)
 
     //on met à jour la position de la pièce dans ses attributs
     piece_ptr->set_position(destination[0], destination[1]);
-    
+
+}
+
+void Echiquier::affiche_message_echec(couleur_t couleur_joueur, Echiquier &echiquier)
+{
+    if(couleur_joueur== blanc)
+    {
+        if(test_echec(noir, echiquier)== true)
+        {
+            cout<<"echec au roi noir"<<endl;
+        }
+    }
+    else if(couleur_joueur== noir)
+    {
+        if(test_echec(blanc, echiquier)== true)
+        {
+            cout<<"echec au roi blanc"<<endl;
+        }
+    }
 }
 
 void Echiquier::free_pieces()
@@ -343,4 +370,47 @@ void Echiquier::canonical_position() const
         }
     }
     cout<<output<<endl;
+}
+
+bool Echiquier::test_echec(couleur_t couleur_Roi, Echiquier &echiquier)
+{
+    Piece *roi_ptr;
+    Piece **pieces_adverses;
+    Piece **pions_adverses;
+    
+    
+    if(couleur_Roi== blanc)
+    {
+        roi_ptr= piecesb[4];
+        
+        pieces_adverses= piecesn;
+        pions_adverses = pionsn;
+        
+    }
+        
+    else if(couleur_Roi== noir)
+    {
+        roi_ptr= piecesn[4];
+        pions_adverses = pionsb;
+        pieces_adverses= piecesb;
+    }
+
+    vector<int> destination= roi_ptr->get_pos();
+    vector<int> depart;
+
+    //On va tester pour chaque piece adverse, si elle peut se déplacer sur la case du roi
+    for(int k=0; k<NBCOL; k++)
+    {
+        depart= pieces_adverses[k]->get_pos();
+
+        if(pieces_adverses[k]->test_mouvement_piece(destination, depart, echiquier)== true)
+            return true;
+
+        depart= pions_adverses[k]->get_pos();
+
+        if(pions_adverses[k]->test_mouvement_piece(destination, depart, echiquier)== true)
+            return true;
+    }
+
+    return false;  
 }

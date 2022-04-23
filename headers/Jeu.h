@@ -36,7 +36,8 @@ class Jeu
         //demande où est ce que le joueur veux jouer, et enregistre les coordonnées saisies, en vérifiant la validité du coup
         Coup demander_coup(Echiquier &echiquier, couleur_t couleur) const;
        
-
+        //Regarde si le coup joué nous met nous même en echec, si oui, demande un autre coup et renvoie true, renvois juste false si non
+        bool traitement_auto_echec(Coup &coup, couleur_t couleur_joueur, Echiquier &echiquier) const;
 
         // bool saisie_correcte_petitroque(string const & cmd) {
         // regex mouvmtpattern("(O|o|0)-(O|o|0)");

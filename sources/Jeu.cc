@@ -162,10 +162,10 @@ Coup Jeu::demander_coup(Echiquier &echiquier, couleur_t couleur_joueur) const
             continue;
 
         //on teste si la piece est de la couleur du joueur qui doit jouer
-        /*modif_coup= traitement_couleur(coup, echiquier, couleur_joueur);
+        modif_coup= traitement_couleur(coup, echiquier, couleur_joueur);
 
         if(modif_coup== true)
-            continue;*/
+            continue;
 
 
         //on récupère les coordonnées de la pièce qu'il faut bouger
@@ -190,11 +190,30 @@ Coup Jeu::demander_coup(Echiquier &echiquier, couleur_t couleur_joueur) const
             continue;
 
 
-        //modif_coup=(...).traitement_auto_echec()
+        modif_coup=traitement_auto_echec(coup, couleur_joueur, echiquier);
                 
-        // if(modif_coup== true)
-        // continue;
+        if(modif_coup== true)
+            continue;
     }
                 
     return coup;
+}
+
+bool traitement_auto_echec(Coup &coup, couleur_t couleur_joueur, Echiquier &echiquier)
+{
+    bool modif_string_coup= false;
+
+    bool jouable= echiquier.test_echec(couleur_joueur, echiquier);
+  
+    if(jouable== false) 
+    {
+        string string_coup;
+
+        modif_string_coup= true;
+        cout<< "vous ne pouvez pas jouer un coup qui vous met en echec, veuillez entrer un autre coup\n"<< endl;
+        cin>> string_coup;
+        coup.set_string_coup(string_coup);
+    }    
+    
+    return  modif_string_coup;
 }
