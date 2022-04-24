@@ -24,9 +24,12 @@ class Piece
         string representation; 
         int position_i;
         int position_j;
+
+        //on compte le nombre de coup joué par chque pièce (c'est utile pour la prise en passant, et le roque entre autre)
+        int nbr_de_coup;
     
     public:
-        Piece(couleur_t couleur, string repr, int i, int j): couleur(couleur), representation(repr), position_i(i), position_j(j){};
+        Piece(couleur_t couleur, string repr, int i, int j, int nbr_de_coup= 0): couleur(couleur), representation(repr), position_i(i), position_j(j){};
         ~Piece();
 
         void affiche() const;
@@ -37,12 +40,18 @@ class Piece
 
         couleur_t get_couleur();
 
+        int get_nbr_de_coup();
+
         void set_position(int pos_i, int pos_j);
 
-       
+        //incrémente de nombre de coup joué par une piece
+        void incr_nbr_de_coup();
 
+        //decrémenter le nombre de coup joué pas une pièce
+        void decr_nbr_de_coup();
+ 
         //retourne si oui ou non, la piece a la capacité de se déplacer aux coordonnées saisis (le fait que la case destination se trouve bien sur l'echiquier a deja été verifié)
-        virtual bool test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const =0;
+        virtual bool test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const =0;
      
        
         //affiche un message d'erreur tant que le coup saisi est impossible à effectué par la pièce en question
@@ -58,13 +67,10 @@ class Piece
 class Pion: public Piece
 {
     private:
-        int nbr_de_coup;
 
     public:
-        Pion(couleur_t couleur, string repr, int i, int j, int nbr_de_coup= 0): Piece(couleur ,repr, i, j){};
+        Pion(couleur_t couleur, string repr, int i, int j): Piece(couleur ,repr, i, j){};
         ~Pion();
-
-        void incr_nbr_de_coup();
 
         void set_bool_premier_coup();
 
@@ -73,7 +79,7 @@ class Pion: public Piece
        
         //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
         //dans les commentaires, on appailera (x,y) les coordonnées de départ du coup
-        bool test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const ;
+        bool test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const ;
         
 };
 
@@ -81,13 +87,14 @@ class Pion: public Piece
 class Tour: public Piece
 {
     private:
-        
+       
+
     public:
         Tour(couleur_t couleur, string repr, int i, int j): Piece(couleur ,repr, i, j){};
         ~Tour();
 
         //retourne si oui ou non, la piece a la capacité de se déplacer aux coordonnées saisis
-        bool test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const;
+        bool test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const;
         
 };
 
@@ -102,7 +109,7 @@ class Cheval: public Piece
 
 
         //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
-        bool test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const;
+        bool test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const;
        
 };
 
@@ -116,7 +123,7 @@ class Fou: public Piece
 
 
         //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
-        bool test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const;
+        bool test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const;
         
 };
 
@@ -129,7 +136,7 @@ class Reine: public Piece
         ~Reine();
 
         //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
-        bool test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const;       
+        bool test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const;       
 };
 
 class Roi: public Piece
@@ -142,7 +149,7 @@ class Roi: public Piece
 
 
         //retourne si oui ou non, une piece a la capacité de se déplacer aux coordonnées saisis
-        bool test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const;         
+        bool test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const;         
 };
 
 

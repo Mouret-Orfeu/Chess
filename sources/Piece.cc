@@ -14,10 +14,14 @@ void Piece::affiche() const
     cout<<representation;
 }
 
+/******************************************************************************/
+
 string Piece::get_repre()
 {
     return representation;
 }
+
+/******************************************************************************/
 
 vector<int> Piece::get_pos()
 {
@@ -28,10 +32,22 @@ vector<int> Piece::get_pos()
     return coord;
 }
 
+/******************************************************************************/
+
 couleur_t Piece::get_couleur()
 {
     return couleur;
 }
+
+/******************************************************************************/
+
+int Piece::get_nbr_de_coup()
+{
+    return nbr_de_coup;
+}
+
+
+/******************************************************************************/
 
 
 void Piece::set_position(int pos_i, int pos_j)
@@ -40,15 +56,32 @@ void Piece::set_position(int pos_i, int pos_j)
     position_j= pos_j;
 }
 
+/******************************************************************************/
+
+void Piece::incr_nbr_de_coup()
+{
+    nbr_de_coup++;
+}
+
+/******************************************************************************/
+
+void Piece::decr_nbr_de_coup()
+{
+    nbr_de_coup--;
+}
+
+
+/******************************************************************************/
+
 bool Piece::traitement_collision(Coup &coup, Echiquier &echiquier, couleur_t couleur_joueur) const
 {
     vector<vector<int>> int_coup= coup.string_to_int_coord();
     vector<int> destination     = coup.extract_coord_destination(int_coup);
 
     //AFFICHAGE DEBUG 
-    int pos_i_dest= destination[0];
-    int pos_j_dest= destination[1];
-    printf("coord case destination coup: %d , %d\n", pos_i_dest, pos_j_dest);
+    //int pos_i_dest= destination[0];
+    //int pos_j_dest= destination[1];
+    //printf("coord case destination coup: %d , %d\n", pos_i_dest, pos_j_dest);
 
     Piece ***grille= echiquier.get_grille();
 
@@ -80,15 +113,15 @@ bool Piece::traitement_collision(Coup &coup, Echiquier &echiquier, couleur_t cou
     return  modif_string_coup;
 }
 
-
+/******************************************************************************/
 
 bool Piece::traitement_deplacement_piece(Coup &coup, Echiquier &echiquier) const 
 {
     //cette variable sert à savor si le joueur a dû saisir un nouveau coup car celui tapé n'était pas valide
     bool modif_string_coup= false;
 
-    
-    
+    Piece***grille= echiquier.get_grille();
+
     string string_coup= coup.get_string_coup();
     //on convertie le string_coup en int_coup (exemple a1b1 devient [[0,0],[1,0]])
     vector<vector<int>> int_coord_coup= coup.string_to_int_coord();
@@ -106,34 +139,25 @@ bool Piece::traitement_deplacement_piece(Coup &coup, Echiquier &echiquier) const
         coup.set_string_coup(string_coup);
         
         //AFFICHAGE DEBUG 
-        string string_coup_affiche= coup.get_string_coup();
-        cout<<"new coup: "<<string_coup_affiche<<endl;
+        //string string_coup_affiche= coup.get_string_coup();
+        //cout<<"new coup: "<<string_coup_affiche<<endl;
     }     
 
     return modif_string_coup;
 }
 
 
-
 /****************************************************************************************************************/
 //Pion 
 
-//int Pion::getnb..
-
-void Pion::incr_nbr_de_coup()
-{
-    nbr_de_coup++;
-}
-
-
 //on notera (i,j) la position de départ de la piece à déplacer 
 
-bool Pion::test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const
+bool Pion::test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const
 {
     //AFFICHAGE DEBUG
     //cout<<representation<<endl;
-    
-    Piece*** grille= echiquier.get_grille();
+
+    Piece***grille= echiquier.get_grille();
 
     vector<int> coord_pion_vient_d_etre_jouer_blanc= echiquier.get_coord_pion_blanc_vient_d_etre_jouer();
     vector<int> coord_pion_vient_d_etre_jouer_noir= echiquier.get_coord_pion_noir_vient_d_etre_jouer();
@@ -146,6 +170,9 @@ bool Pion::test_mouvement_piece(vector<int> destination, vector<int> depart, Ech
     //les blancs commenceront toujours en haut du plateau, les noir en bas
     if (couleur== blanc)
     { 
+        //AFFICHAGE DEBUG
+        //cout<<"coord_pion_vient_d_etre_jouer_noir: "<<coord_pion_vient_d_etre_jouer_noir[0]<<","<<coord_pion_vient_d_etre_jouer_noir[1]<<endl;
+
         //tester si destination== (i-1, j) (i.e si le pion est a avancé d'une case vers le bas en restant sur la meme colonne)
         //Et si il y a pas de pièce sur cette case
         if(destination[0]== depart[0]-1 && destination[1]== depart[1] && piece_ptr== NULL)
@@ -177,7 +204,11 @@ bool Pion::test_mouvement_piece(vector<int> destination, vector<int> depart, Ech
                 if(((Pion*)pion_adverse)->nbr_de_coup==1)
                     //si on est sur la bonne ligne
                     if(depart[0]== 3)
+                    {
+                        //AFFICHAGE DEBUG
+                        cout<<"prise en passant gauche pion blanc"<<endl;
                         return true;
+                    }
             }
         }
 
@@ -201,6 +232,9 @@ bool Pion::test_mouvement_piece(vector<int> destination, vector<int> depart, Ech
                 
     if (couleur== noir)
     {
+        //AFFICHAGE DEBUG
+        //cout<<"coord_pion_vient_d_etre_jouer_blanc: "<<coord_pion_vient_d_etre_jouer_blanc[0]<<","<<coord_pion_vient_d_etre_jouer_blanc[1]<<endl;
+
         //tester si destination== (i+1, j)
         if(destination[0]== depart[0]+1 && destination[1]== depart[1] && piece_ptr== NULL)
             return true;
@@ -218,30 +252,34 @@ bool Pion::test_mouvement_piece(vector<int> destination, vector<int> depart, Ech
         //voir si destinnation==(i+1,j+1), si le pion peut manger à droite
         else if(piece_ptr!= NULL && destination[0]== depart[0]+1 && destination[1]== depart[1]+1)
             return true;
-        
+
         //voir pour la prise en passant à gauche
         //si il y a un pion blanc qui vient d'être joué à gauche de la piece de départ du coup
         else if(coord_pion_vient_d_etre_jouer_blanc[0]== depart[0] && coord_pion_vient_d_etre_jouer_blanc[1]== depart[1]-1)
         {
             //AFFICHAGE DEBUG 
-            printf("COORD PION VIENT D'ETRE JOUÉ OK \n");
+            //printf("COORD PION VIENT D'ETRE JOUÉ OK \n");
 
             //si la destination est juste deriere le pion adverse
             if(destination[0]== depart[0]+1 && destination[1]== depart[1]-1)
             { 
                 //AFFICHAGE DEBUG 
-                printf("DESTINATION OK \n");
+                //printf("DESTINATION OK \n");
 
                 Piece * pion_adverse= grille[coord_pion_vient_d_etre_jouer_blanc[0]][coord_pion_vient_d_etre_jouer_blanc[1]];
                 //si le pion adverse ne s'est deplacé qu'une fois
                 if(((Pion*)pion_adverse)->nbr_de_coup==1)
                 {
                     //AFFICHAGE DEBUG 
-                    printf("NOMBRE DE COUP PION OK\n");
+                    //printf("NOMBRE DE COUP PION OK\n");
 
                     //si on est sur la bonne ligne
                     if(depart[0]== 4)
+                    {
+                        //AFFICHAGE DEBUG
+                        cout<<"prise en passant gauche pion noir"<<endl;
                         return true;
+                    }
                 }
             }
         }
@@ -272,12 +310,13 @@ bool Pion::test_mouvement_piece(vector<int> destination, vector<int> depart, Ech
 /****************************************************************************************************************/
 //Tour
 
-bool Tour::test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const
+bool Tour::test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const
 {
     //AFFICHAGE DEBUG
     //cout<<representation<<endl;
 
-    Piece*** grille= echiquier.get_grille();
+    Piece***grille= echiquier.get_grille();
+
             
     //voir si destination est du type (i, j+ou-n)
     if(destination[0]== depart[0] && destination[1]!= depart[1])
@@ -362,14 +401,13 @@ bool Tour::test_mouvement_piece(vector<int> destination, vector<int> depart, Ech
 /****************************************************************************************************************/
 //Cheval
 
-bool Cheval::test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const
+bool Cheval::test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const
 {
     (void)echiquier;
 
     //AFFICHAGE DEBUG
     //cout<<representation<<endl;
     
-    //Piece*** grille= echiquier.get_grille();
 
     //voir si destination est du type (i+ou-1, j+ou-2) 
     if((destination[0]== depart[0]+1 || destination[0]== depart[0]-1) && (destination[1]== depart[1]+2 || destination[1]== depart[1]-2))
@@ -389,9 +427,9 @@ bool Cheval::test_mouvement_piece(vector<int> destination, vector<int> depart, E
 /****************************************************************************************************************/
 //Fou
 
-bool Fou::test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const
+bool Fou::test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const
 {
-    Piece*** grille= echiquier.get_grille();
+    Piece***grille= echiquier.get_grille();
 
     //n est le nombre de marche d'escalier dont s'est déplacé le fou (se déplacer d'une case en diagonale représentant une marche d'escalier)
     int n= destination[0]-depart[0];
@@ -408,7 +446,7 @@ bool Fou::test_mouvement_piece(vector<int> destination, vector<int> depart, Echi
         if(n<0)
         {
             //AFFICHAGE DEBUG
-            printf("on rentre dans le if vers le bas droite fou\n");
+            //printf("on rentre dans le if vers le bas droite fou\n");
             
             it_i--;
             it_j++;
@@ -428,7 +466,7 @@ bool Fou::test_mouvement_piece(vector<int> destination, vector<int> depart, Echi
         if(n>0)
         {
             //AFFICHAGE DEBUG
-            printf("on rentre dans le if vers le haut gauche fou\n");
+            //printf("on rentre dans le if vers le haut gauche fou\n");
 
             it_i++;
             it_j--;
@@ -439,7 +477,7 @@ bool Fou::test_mouvement_piece(vector<int> destination, vector<int> depart, Echi
                 if(grille[it_i][it_j]!= NULL)
                 {    
                     //AFFICHAGE DEBUG
-                    printf("on rentre dans le if collision adverse vers le haut gauche fou\n");
+                    //printf("on rentre dans le if collision adverse vers le haut gauche fou\n");
                     return false;
                 }
                 it_i++;
@@ -462,7 +500,7 @@ bool Fou::test_mouvement_piece(vector<int> destination, vector<int> depart, Echi
         if(n>0)
         {
             //AFFICHAGE DEBUG
-            printf("on rentre dans le if vers le haut droite fou\n");
+            //printf("on rentre dans le if vers le haut droite fou\n");
 
             it_i++;
             it_j++;
@@ -482,7 +520,7 @@ bool Fou::test_mouvement_piece(vector<int> destination, vector<int> depart, Echi
         if(n<0)
         {
             //AFFICHAGE DEBUG
-            printf("on rentre dans le if vers le bas gauche fou\n");
+            //printf("on rentre dans le if vers le bas gauche fou\n");
 
             it_i--;
             it_j--;
@@ -511,12 +549,12 @@ bool Fou::test_mouvement_piece(vector<int> destination, vector<int> depart, Echi
 /****************************************************************************************************************/
 //Reine
 
-bool Reine::test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const
+bool Reine::test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const
 {
+    Piece***grille= echiquier.get_grille();
+
     //AFFICHAGE DEBUG
     //cout<<representation<<endl;
-    
-    Piece*** grille= echiquier.get_grille();
             
             
     //voir si destination est du type de celui d'une Tour (c'est le même code que la Tour)
@@ -701,12 +739,12 @@ bool Reine::test_mouvement_piece(vector<int> destination, vector<int> depart, Ec
 /****************************************************************************************************************/
 //Roi
 
-bool Roi::test_mouvement_piece(vector<int> destination, vector<int> depart, Echiquier &echiquier) const
+bool Roi::test_mouvement_piece(vector<int> destination, vector<int> depart,const Echiquier &echiquier) const
 {
     //AFFICHAGE DEBUG
-    cout<<representation<<endl;
+    //cout<<representation<<endl;
     
-    //Piece*** grille= echiquier.get_grille();
+    (void)echiquier;
             
     //voir si destination est du type de celui d'une Tour, avec des déplacements d'une seule case
 

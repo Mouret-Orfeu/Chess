@@ -8,8 +8,7 @@
 -pas oublier de tt free à la fin 
 
 -Mettre les commentaires en dox dans les .h
-
--remettre l'alternance blanc noir
+et mettre ce qu'il faut dans make file pour pouvoir créer la doc doxygen 
 
 -voir pour mettre des const partout sur les arguments et les fonctions
 
@@ -20,9 +19,20 @@ void canonical_position() const;
 //renvoie le code d'une pièce (ex: wK pour le roi blanc) à partir de sa représentation
 string pgn_piece_name(string const name, bool view_pawn, bool view_color) const;
 
--essayer d'enlever les arguments des méthodes qui répètent l'objet sur lequel est appliquée la méthode 
+-essayer d'enlever les arguments des méthodes qui répètent l'objet sur lequel est appliquée la méthode, il faut mettre *this il me semble
 
 -éclater les fonctions en plusieurs sous fonctions quand c'est possibe et pertinent
 
 -raccourcir les lignes trop longues
 
+-tester avec les tests du prof
+
+-essayer de faire un constructeur de Coup ou t'as rien besoin de sécifier comme argument, et utiliser ce constructeur dans le main
+
+-deplacer les attributs
+ vector<int> coord_pion_blanc_vient_d_etre_jouer;
+vector<int> coord_pion_noir_vient_d_etre_jouer;
+
+dans la class Coup
+
+-enlever les //AFFICHAGE DEBUG

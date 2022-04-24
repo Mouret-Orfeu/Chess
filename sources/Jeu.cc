@@ -7,14 +7,15 @@
 
 
 
+/******************************************************************************/
 
-
-bool Jeu::test_hors_plateau(string const & cmd) const
+bool Jeu::saisie_correcte(string const & cmd) const
 {
     regex mouvmtpattern("[a-h][1-8][a-h][1-8]");
     return regex_match(cmd,mouvmtpattern);
 }
 
+/******************************************************************************/
 
 bool Jeu::traitement_saisie(Coup &coup) const
 {
@@ -22,7 +23,7 @@ bool Jeu::traitement_saisie(Coup &coup) const
 
     bool modif_string_coup= false;
     
-    bool correcte= test_hors_plateau(string_coup);
+    bool correcte= saisie_correcte(string_coup);
   
     if(correcte== false)
     {
@@ -37,16 +38,15 @@ bool Jeu::traitement_saisie(Coup &coup) const
     return  modif_string_coup;  
 }
 
-
-
+/******************************************************************************/
 
 bool Jeu::test_case_vide(Coup &coup, Echiquier &echiquier) const
 {
     Piece*** grille= echiquier.get_grille();
 
     //AFFICHAGE DEBUG
-    string string_coup_actuel= coup.get_string_coup();
-    cout<<"coup actuel: "<<string_coup_actuel<<endl;
+    //string string_coup_actuel= coup.get_string_coup();
+    //cout<<"coup actuel: "<<string_coup_actuel<<endl;
 
     //on convertie le string_coup en int_coup 
     vector<vector<int>> int_coord_coup= coup.string_to_int_coord();
@@ -55,9 +55,9 @@ bool Jeu::test_case_vide(Coup &coup, Echiquier &echiquier) const
     vector<int> int_depart= coup.extract_coord_depart(int_coord_coup);
 
     //AFFICHAGE DEBUG
-    int pos_i_test= int_depart[0];
-    int pos_j_test= int_depart[1];
-    printf("coord case depart coup: %d , %d\n", pos_i_test, pos_j_test);
+    //int pos_i_test= int_depart[0];
+    //int pos_j_test= int_depart[1];
+    //printf("coord case depart coup: %d , %d\n", pos_i_test, pos_j_test);
             
     //on regarde dans la grille de l'echiquier, aux coordonnées correspondantes au départ du coup voulu, et on renvoie false si c'est une case vide, true sinon
     bool il_y_a_une_piece= true;
@@ -67,6 +67,7 @@ bool Jeu::test_case_vide(Coup &coup, Echiquier &echiquier) const
     return il_y_a_une_piece;
 }
 
+/******************************************************************************/
 
 bool Jeu::traitement_depart_coup(Coup &coup, Echiquier &echiquier) const
 {
@@ -87,6 +88,8 @@ bool Jeu::traitement_depart_coup(Coup &coup, Echiquier &echiquier) const
     return  modif_string_coup;
 }
 
+/******************************************************************************/
+
 bool Jeu::traitement_couleur(Coup &coup, Echiquier &echiquier, couleur_t couleur) const
 {
     vector<vector<int>> int_coup= coup.string_to_int_coord();
@@ -99,10 +102,11 @@ bool Jeu::traitement_couleur(Coup &coup, Echiquier &echiquier, couleur_t couleur
 
     couleur_t couleur_piece= grille[depart[0]][depart[1]]->get_couleur();
 
-    if(couleur_piece== blanc)
-        printf("jouer la piece blanche\n");
-    if(couleur_piece== noir)
-        printf("jouer la piece noire\n");
+    //AFFICHAGE DEBUG
+    //if(couleur_piece== blanc)
+    //    printf("jouer la piece blanche\n");
+    //if(couleur_piece== noir)
+    //    printf("jouer la piece noire\n");
 
     if(couleur_piece != couleur)
     {
@@ -118,35 +122,71 @@ bool Jeu::traitement_couleur(Coup &coup, Echiquier &echiquier, couleur_t couleur
     return  modif_string_coup;
 }
 
+/******************************************************************************/
 
-
-Coup Jeu::demander_coup(Echiquier &echiquier, couleur_t couleur_joueur) const
+void Jeu::demander_coup(Echiquier &echiquier, couleur_t couleur_joueur, Coup &coup) const
 {
+
     cout<< "\n où voulez vous jouer? \n";
     string string_coup;
     cin>> string_coup;
 
-    Coup coup(string_coup);
+    //on set up les valeurs initiales des attributs du coup
+    coup.set_string_coup(string_coup);
+    coup.set_piece_prise(NULL);
 
     bool modif_coup= true;
 
     Piece*** grille= echiquier.get_grille();
     Piece *piece_depart_ptr;
 
-    //AFFICHAGE DEBUG 
-    int compt=-1;
-
     //on va repasser tous les tests jusqu'à ce qu'on ai plus besoin de modifier le coup saisie
     while(modif_coup== true)
     {
-        //AFFICHAGE DEBUG 
-        compt++;
-        string string_coup_while= coup.get_string_coup();
-        cout<<"while boucle "<<compt<<" : "<<string_coup_while<<endl;
+        coup.set_type_de_coup(pas_un_roque);
 
         //on teste si le joueur veut arreter la partie
-        if(string_coup.compare("/quit")==0)
+        if(coup.get_string_coup().compare("/quit")==0)
             break;
+
+        //on teste si le joueur veut jouer un petit ou un grand roque
+        bool bool_petit_roque= saisie_correcte_petitroque((string const)coup.get_string_coup());
+        bool bool_grand_roque= saisie_correcte_grandroque((string const)coup.get_string_coup());
+
+        if(bool_petit_roque== true || bool_grand_roque== true)
+        {
+            if(bool_petit_roque== true)
+                coup.set_type_de_coup(petit_roque);
+            if(bool_grand_roque== true)
+                coup.set_type_de_coup(grand_roque);
+            
+            modif_coup= echiquier.traitement_roque(coup, couleur_joueur);
+
+            //si le roque respact les conditions du roque (i.e on a pas du modifier le coup)
+            //ce qui inclus le test de couleur et de pièce au départ du coup
+            if(modif_coup== false)
+            {
+
+                //AFFICHAGE DEBU
+                cout<<"juste avant traitement auto-echec"<<endl;
+
+                //on test si on ne se met pas en echec en roquant
+                modif_coup= traitement_auto_echec(coup, couleur_joueur, echiquier);
+
+
+                //AFFICHAGE DEBU
+                cout<<"juste apres traitement auto-echec"<<endl;
+                
+                if(modif_coup== true)
+                    continue;
+                else
+                    break;
+
+            }
+
+            if(modif_coup== true)
+                continue;
+        }
 
         //on teste si le coup saisie est bien de la forme LettreChiffreLettreChiffre et que ça correspond bien à une case existante
         modif_coup= traitement_saisie(coup);
@@ -175,7 +215,8 @@ Coup Jeu::demander_coup(Echiquier &echiquier, couleur_t couleur_joueur) const
         //on test si la pièce aux cordonnées de départ du coup a la capacité de se déplacer à la destination saisie
         //Ce test prend en compte le fait qu'une pièces ne peuvent pas passer à travers une autre pièce (sauf pur le Cheval) 
         piece_depart_ptr= grille[depart[0]][depart[1]];
-                
+
+
         modif_coup= piece_depart_ptr->traitement_deplacement_piece(coup, echiquier);
 
         if(modif_coup== true)
@@ -189,31 +230,94 @@ Coup Jeu::demander_coup(Echiquier &echiquier, couleur_t couleur_joueur) const
         if(modif_coup== true)
             continue;
 
+        //AFFICHAGE DEBUG
+        cout<<"JUSTE AVANT TRAITEMENT AUTO ECHEC"<<endl;
+                
 
         modif_coup= traitement_auto_echec(coup, couleur_joueur, echiquier);
                 
         if(modif_coup== true)
             continue;
+
+        //AFFICHAGE DEBUG
+        cout<<"JUSTE APRES TRAITEMENT AUTO ECHEC"<<endl;
     }
+
+    //AFFICHAGE DEBUG
+    cout<<"fin demander coup"<<endl;
                 
-    return coup;
+    return;
 }
+
+/******************************************************************************/
 
 bool Jeu::traitement_auto_echec(Coup &coup, couleur_t couleur_joueur, Echiquier &echiquier) const 
 {
     bool modif_string_coup= false;
 
-    bool jouable= !(echiquier.test_echec(couleur_joueur, echiquier));
+    //AFFICHAGE DEBUG
+    //cout<<"traitement auto-echec"<<endl;
+
+    //pour tester si on va être en echec après ce coup, on va jouer le coup, tester l'echec, puis annuler le coup joué
+    vector<vector<int>> int_coup= coup.string_to_int_coord();
+    vector<int> depart          = coup.extract_coord_depart(int_coup);
+    vector<int> destination     = coup.extract_coord_depart(int_coup);
+
+    echiquier.joue_le_coup(coup, couleur_joueur, true);
+
+
+    //AFFICHAGE DEBUG
+    cout<<"coup de test"<<endl;
+    echiquier.affiche();
+    
+
+    //AFFICHAGE DEBUG
+    //vector<int> coord_blanc_2= echiquier.get_coord_pion_blanc_vient_d_etre_jouer();
+    //vector<int> coord_noir_2= echiquier.get_coord_pion_noir_vient_d_etre_jouer();
+    //cout<<"JOUER: coord pion blanc :"<<coord_blanc_2[0]<<","<<coord_blanc_2[1]<<endl;
+    //cout<<"JOUER: coord pion noir:"<<coord_noir_2[0]<<","<<coord_noir_2[1]<<endl;
+
+    
+    bool jouable= !(echiquier.test_echec(couleur_joueur));
+
+    echiquier.annule_le_coup(coup, couleur_joueur);
+
+    cout<<"coup annulé"<<endl;
+    echiquier.affiche();
+
+    //AFFICHAGE DEBUG
+    //vector<int> coord_blanc= echiquier.get_coord_pion_blanc_vient_d_etre_jouer();
+    //vector<int> coord_noir= echiquier.get_coord_pion_noir_vient_d_etre_jouer();
+    //cout<<"ANNULER: coord pion blanc :"<<coord_blanc[0]<<","<<coord_blanc[1]<<endl;
+    //cout<<"ANNULER: coord pion noir:"<<coord_noir[0]<<","<<coord_noir[1]<<endl;
+
+
   
     if(jouable== false) 
     {
         string string_coup;
 
         modif_string_coup= true;
-        cout<< "vous ne pouvez pas jouer un coup qui vous met en echec, veuillez entrer un autre coup\n"<< endl;
+        cout<< "\n vous ne pouvez pas jouer un coup qui vous met en echec, veuillez entrer un autre coup\n"<< endl;
         cin>> string_coup;
         coup.set_string_coup(string_coup);
     }    
     
     return  modif_string_coup;
+}
+
+/******************************************************************************/
+
+bool Jeu::saisie_correcte_petitroque(string const & cmd) const
+{
+    regex mouvmtpattern("(O|o|0)-(O|o|0)");
+    return regex_match(cmd,mouvmtpattern);
+}
+
+/******************************************************************************/
+
+bool Jeu::saisie_correcte_grandroque(string const & cmd) const
+{
+    regex mouvmtpattern("(O|o|0)-(O|o|0)-(O|o|0)");
+    return regex_match(cmd,mouvmtpattern);
 }

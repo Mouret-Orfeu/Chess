@@ -9,15 +9,14 @@ using namespace std;
 int main() 
 {
 
-    Echiquier echiquier;   //initialise l'echiquier
-
-    //AFFICHAGE DEBUG
-    vector<int> get_coord_pion_blanc_vient_d_etre_jouer();
-    vector<int> get_coord_pion_noir_vient_d_etre_jouer();
-
-    Jeu jeu;             //initialise le jeu 
+    Echiquier echiquier;                               //initialise l'echiquier
+    Jeu jeu;                                           //initialise le jeu 
+                                               
+    //on créer 1 seul objet coup pour toute la partie
+    //on le modifie à chaque fois qu'il le faut.
+    Coup coup;             //initialisation de l'objet coup
     
-    couleur_t couleur_du_joueur= blanc;
+    couleur_t couleur_joueur= blanc;
     int it=0;
     
     bool stop(false);
@@ -25,22 +24,26 @@ int main()
     
     do
     {
-        Coup coup= jeu.demander_coup(echiquier, couleur_du_joueur);
+        jeu.demander_coup(echiquier, couleur_joueur, coup);
 
-        //AFFICHAGE DEBUG 
-        string string_coup= coup.get_string_coup();
-        cout<<"ce qui sort de demander_coup: "<<string_coup<<endl;
-
-        if (string_coup!= "/quit") 
+        if ((coup.get_string_coup())!= "/quit") 
         {
-            echiquier.joue_le_coup(coup, couleur_du_joueur, echiquier);
+            //AFFICHAGE DEBUG
+            vector<int> depart= coup.get_depart_coup();
+            Piece* piece_ptr= (echiquier.get_grille())[depart[0]][depart[1]];
+            cout<<"piece_ptr MAIN :"<<piece_ptr<<endl;
+
+            echiquier.joue_le_coup(coup, couleur_joueur, false);
+
             echiquier.affiche();
+
+            echiquier.affiche_message_echec(couleur_joueur);
 
             it++;
             if(it%2== 0)
-                couleur_du_joueur= blanc;
+                couleur_joueur= blanc;
             else
-                couleur_du_joueur= noir;
+                couleur_joueur= noir;
 
         }
         else stop=true;
