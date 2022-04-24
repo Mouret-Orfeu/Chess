@@ -28,11 +28,6 @@ int main()
 
         if ((coup.get_string_coup())!= "/quit") 
         {
-            //AFFICHAGE DEBUG
-            vector<int> depart= coup.get_depart_coup();
-            Piece* piece_ptr= (echiquier.get_grille())[depart[0]][depart[1]];
-            cout<<"piece_ptr MAIN :"<<piece_ptr<<endl;
-
             echiquier.joue_le_coup(coup, couleur_joueur, false);
 
             echiquier.affiche();

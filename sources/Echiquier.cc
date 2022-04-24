@@ -172,28 +172,16 @@ void Echiquier::affiche () const
 
 /******************************************************************************/
 
-
 void Echiquier::joue_le_coup(Coup &coup, couleur_t couleur_joueur, bool pour_tester_auto_echec)
 {
     //jouer un roque***********************************************************/
 
-    //AFFICHAGE DEBUG
-    cout<<"juste avant de gérer le roque"<<endl;
-
     //gerer le roque
     bool roque= gerer_le_roque(coup, couleur_joueur);
 
-    //AFFICHAGE DEBUG
-    cout<<"juste apres de gérer le roque"<<endl;
-
-
     if(roque== true)
-    {
-        //AFFICHAGE DEBUG
-        cout<<"roque joué avec succès"<<endl;
-
         return;
-    }
+    
         
 
     //jouer un coup normale****************************************************/
@@ -225,27 +213,18 @@ void Echiquier::joue_le_coup(Coup &coup, couleur_t couleur_joueur, bool pour_tes
     //gerer la prise en passant (ne déplace pas notre pion, mange juste le pion adverse, et met à jour les coordonnées des derniers pions déplacés)
     gerer_prise_en_passant(repr_piece, depart, destination, coord_pion_noir_vient_d_etre_jouer, coord_pion_blanc_vient_d_etre_jouer, piece_ptr, couleur, coup);
 
-    //AFFICHAGE DEBUG
-    //cout<<"ECHIQUIER apres gerer prise: coord pion blanc :"<<coord_pion_blanc_vient_d_etre_jouer[0]<<","<<coord_pion_blanc_vient_d_etre_jouer[1]<<endl;
-    //cout<<"ECHIQUIER apres gerer prise: coord pion noir:"<<coord_pion_noir_vient_d_etre_jouer[0]<<","<<coord_pion_noir_vient_d_etre_jouer[1]<<endl;
-
     //on modifie la grille de l'échiquier conformément au coup 
     deplacement_piece(destination, depart, piece_ptr, coup);
-
-    //AFFICHAGE DEBUG
-    cout<<"avant gerer_promotion"<<endl;
-    cout<<"piece_ptr JUSTE AVANT GERER PROM:"<<piece_ptr<<endl;
 
     //si je suis pas en train de jouer le coup juste pour tester l'auto echec
     if(pour_tester_auto_echec== false)
         gerer_promotion(coup, piece_ptr);
 
-    //AFFICHAGE DEBUG
-    cout<<"apres gerer_promotion"<<endl;
 
     //on incrémente le nbr de coup de la piece
     piece_ptr->incr_nbr_de_coup();
 }
+
 
 /******************************************************************************/
 
@@ -254,9 +233,6 @@ bool Echiquier::gerer_le_roque(Coup &coup, couleur_t couleur)
     string string_coup= coup.get_string_coup();
 
     type_de_coup_t type_de_coup= coup.get_type_de_coup();
-
-    //AFFICHAGE DEBUG 
-    cout<<"juste avant de jouer le roque"<<endl;
 
     if(type_de_coup== petit_roque)
     {
@@ -269,10 +245,6 @@ bool Echiquier::gerer_le_roque(Coup &coup, couleur_t couleur)
         return true;
     }
     else
-
-        //AFFICHAGE DEBUG
-        cout<<"PAS DE ROQUE"<<endl;
-
         return false;
 }
 
@@ -293,42 +265,24 @@ void Echiquier::jouer_le_roque(Coup &coup, couleur_t couleur, type_de_coup_t roq
    
     if(couleur== blanc)
     {
-        //AFFICHAGE DEBUG
-        cout<<"roi blanc 1"<<endl;
-
         roi_ptr= piecesb[4];
         depart_roi= roi_ptr->get_pos();
 
-        //AFFICHAGE DEBUG
-        cout<<"roi blanc 2"<<endl;
-
         if(roque== petit_roque)
         {
-            //AFFICHAGE DEBUG
-            cout<<"roi blanc petit 1"<<endl;
-
             tour_ptr        = piecesb[7];
             destination_roi = {7,6};
             depart_tour     = {7,7}; 
             destination_tour= {7,5};
 
-            //AFFICHAGE DEBUG
-            cout<<"roi blanc petit 2"<<endl;
         }
         //si roque== grand_roque
         else 
         {
-            //AFFICHAGE DEBUG
-            cout<<"roi blanc grand 1"<<endl;
-
-
             tour_ptr        = piecesb[0];
             destination_roi = {7,2};
             depart_tour     = {7,0}; 
             destination_tour= {7,3};
-
-            //AFFICHAGE DEBUG
-            cout<<"roi blanc grand 2"<<endl;
         }
     }
     //si couleur== noir
@@ -354,22 +308,8 @@ void Echiquier::jouer_le_roque(Coup &coup, couleur_t couleur, type_de_coup_t roq
         }  
     }
 
-    //AFFICHAGE DEBUG
-    cout<<"avant deplacement roque"<<endl;
-
-    //AFFICHAGE DEBUG
-    cout<<"depart roi :"<<depart_roi[0]<<","<<depart_roi[1]<<endl;
-    cout<<"destination roi :"<<destination_roi[0]<<","<<destination_roi[1]<<endl;
-
     deplacement_piece(destination_roi, depart_roi, roi_ptr, coup);
-
-    //AFFICHAGE DEBUG
-    cout<<"depart tour :"<<depart_tour[0]<<","<<depart_tour[1]<<endl;
-
     deplacement_piece(destination_tour, depart_tour, tour_ptr, coup);
-    
-    //AFFICHAGE DEBUG
-    cout<<"apres deplacement roque"<<endl;
 }
 
 /******************************************************************************/
@@ -395,16 +335,8 @@ void Echiquier::gerer_prise_en_passant(string repr_piece, vector<int> depart, ve
             }
         }
 
-        //AFFICHAGE DEBUG
-        //cout<<"gerer prise en passant pion noir"<<endl;
-
         //on enregistre la nouvelle position du pion joué
         this->set_coord_pion_noir_vient_d_etre_jouer(destination[0], destination[1]);
-
-        //AFFICHAGE DEBUG
-        //cout<<"coord_pion_noir_vient_d_etre_jouer: "<<coord_pion_noir_vient_d_etre_jouer[0]<<","<<coord_pion_noir_vient_d_etre_jouer[1]<<endl;
-        
-
     } 
     //si la piece qu'on vient de jouer est un pion blanc
     else if(repr_piece.compare("\u265F") ==0)
@@ -424,35 +356,21 @@ void Echiquier::gerer_prise_en_passant(string repr_piece, vector<int> depart, ve
             }
         }
 
-        //AFFICHAGE DEBUG
-        //cout<<"gerer prise en passant pion noir"<<endl;
-
         this->set_coord_pion_blanc_vient_d_etre_jouer(destination[0], destination[1]);
-
-        //AFFICHAGE DEBUG
-        //cout<<"coord_pion_blanc_vient_d_etre_jouer: "<<coord_pion_blanc_vient_d_etre_jouer[0]<<","<<coord_pion_blanc_vient_d_etre_jouer[1]<<endl;
 
     } 
     //si la piece qu'on vient de jouer n'est ni un pion blanc, ni un pion noir
     else
     {
-        //AFFICHAGE DEBUG
-        //printf("ON DEPLACE UNE PIECE NON PION");
 
         if(couleur== blanc)
         {
-            //AFFICHAGE DEBUG
-            //printf(" PIECE BLANCHE NON PION\n");
-
             coord_pion_blanc_vient_d_etre_jouer[0]= -1;
             coord_pion_blanc_vient_d_etre_jouer[1]= -1; 
         }
         
         if(couleur== noir)
         {
-            //AFFICHAGE DEBUG
-            //printf("PIECE NOIRE NON PION\n");
-
             coord_pion_noir_vient_d_etre_jouer[0]= -1;
             coord_pion_noir_vient_d_etre_jouer[1]= -1; 
         }
@@ -480,21 +398,11 @@ void Echiquier::deplacement_piece(vector<int> destination, vector<int> depart, P
     //on met l'@ de piece jouée dans la case destination 
     grille[destination[0]][destination[1]]= piece_ptr;
 
-    //AFFICHAGE DEBUG
-    cout<<"avant avoir mis la case de départ à NULL"<<endl;
-    cout<<"depart: "<<depart[0]<<","<<depart[1]<<endl;
-
     //on met NULL dans la case de départ du coup 
     grille[depart[0]][depart[1]]= NULL;
 
-    //AFFICHAGE DEBUG
-    cout<<"apres avoir mis la case de départ à NULL"<<endl;
-
     //on met à jour la position de la pièce dans ses attributs
     piece_ptr->set_position(destination[0], destination[1]);
-
-    //AFFICHAGE DEBUG
-    cout<<"on sort dans deplacement_piece"<<endl;
 
 }
 
@@ -628,15 +536,7 @@ bool Echiquier::test_echec(couleur_t couleur_Roi) const
 
     vector<int> destination= roi_ptr->get_pos();
 
-    //AFFICHAGE DEBUG
-    //int i_r= destination[0];
-    //int j_r= destination[1];
-    //cout<<"position du roi blanc: "<<i_r<<","<<j_r<<endl;
-
     vector<int> depart;
-
-    //AFFICHAGE DEBUG
-    //string repr;
 
     //On va tester pour chaque piece adverse, si elle peut se déplacer sur la case du roi
     for(int k=0; k<NBCOL; k++)
@@ -670,9 +570,6 @@ bool Echiquier::test_echec(couleur_t couleur_Roi) const
             return true;
     }
 
-    //AFFICHAGE DEBUG
-    //cout<<"test echec terminé"<<endl;
-
     return false;  
 }
 
@@ -686,9 +583,6 @@ void Echiquier::annule_le_coup(Coup &coup, couleur_t couleur)
     //si le dernier coup est un roque
     if(type_de_coup!= pas_un_roque)
     {
-        //AFFICHAGE DEBUG
-        //cout<<"annulation d'un roque"<<endl;
-
         Piece *roi_ptr;
         Piece *tour_ptr;
         
@@ -779,9 +673,6 @@ void Echiquier::annule_le_coup(Coup &coup, couleur_t couleur)
     // si le dernier coup n'est pas un roque
     else
     {
-        //AFFICHAGE DEBUG
-        //cout<<"annulation d'un coup qui n'est pas un roque"<<endl;
-
         vector<int> depart= coup.get_depart_coup();
         vector<int> destination= coup.get_destination_coup();
 
@@ -792,10 +683,6 @@ void Echiquier::annule_le_coup(Coup &coup, couleur_t couleur)
 
         //on remet l'@ de piece jouée dans la case de départ
         grille[depart[0]][depart[1]]= piece_ptr;
-
-        //AFFICHAGE DEBUG
-        cout<<"piece_ptr ANNULE COUP :"<<piece_ptr<<endl;
-        cout<<"coord apres l'annulation :"<<depart[0]<<","<<depart[1]<<endl;
 
         //on met NULL dans la case de destination du coup 
         grille[destination[0]][destination[1]]= NULL;
@@ -859,39 +746,22 @@ bool Echiquier::test_roque(Coup &coup, couleur_t couleur, type_de_coup_t roque)
 
     if(couleur== blanc)
     {
-        //AFFICHAGE DEBUG
-        cout<<"on rentre dans couleur blanc de test_roque 1"<<endl;
-
         roi_ptr= grille[7][4];
-
-        //AFFICHAGE DEBUG
-        cout<<" roi blanc "<<endl;
 
         if(roque== grand_roque)
         {
-            //AFFICHAGE DEBUG
-            cout<<"roi blanc  grand 1"<<endl;
             
             tour_ptr= grille[7][0];
             
             if(roi_ptr!= NULL && tour_ptr!=NULL)
-            {
-                
-                //AFFICHAGE DEBUG
-                cout<<"roi blanc  grand 2"<<endl;
-                
+            {  
                 string repr_roi = roi_ptr->get_repre();
                 string repr_tour= tour_ptr->get_repre();
 
                 if(repr_roi=="\u265A" && repr_tour=="\u265C")
                 {
-                    //AFFICHAGE DEBUG
-                    cout<<"roi blanc  grand 3"<<endl;
-
                     if(roi_ptr->get_nbr_de_coup()==0 && tour_ptr->get_nbr_de_coup()==0)
                     {
-                        //AFFICHAGE DEBUG
-                        cout<<"roi blanc  grand 4"<<endl;
                         jouable= true;
                     }
                 }
@@ -900,28 +770,17 @@ bool Echiquier::test_roque(Coup &coup, couleur_t couleur, type_de_coup_t roque)
         }
         else if(roque== petit_roque)
         {
-            //AFFICHAGE DEBUG
-            cout<<"roi blanc petit 1"<<endl;
-            
             tour_ptr= grille[7][7];
 
             if(roi_ptr!= NULL && tour_ptr!=NULL)
             {
-                //AFFICHAGE DEBUG
-                cout<<"roi blanc petit 2"<<endl;
-                
                 string repr_roi = roi_ptr->get_repre();
                 string repr_tour= tour_ptr->get_repre();
                 
                 if(repr_roi=="\u265A" && repr_tour=="\u265C")
                 {
-                    //AFFICHAGE DEBUG
-                    cout<<"roi blanc petit 3"<<endl;
-                    
                     if(roi_ptr->get_nbr_de_coup()==0 && tour_ptr->get_nbr_de_coup()==0)
                     {  
-                        //AFFICHAGE DEBUG
-                        cout<<"roi blanc petit 4"<<endl;
                         jouable= true;
                     }
                 }
@@ -934,33 +793,18 @@ bool Echiquier::test_roque(Coup &coup, couleur_t couleur, type_de_coup_t roque)
     {
         roi_ptr= grille[0][4];
 
-        
-        //AFFICHAGE DEBUG
-        cout<<"roi noir"<<endl;
-            
-
         if(roque== grand_roque)
         {
-            //AFFICHAGE DEBUG
-            cout<<"roi noir grand 1"<<endl;
-            
             tour_ptr= grille[0][0];
             if(roi_ptr!= NULL && tour_ptr!=NULL)
             {
-                //AFFICHAGE DEBUG
-                cout<<"roi noir grand 2"<<endl;
-               
                 string repr_roi = roi_ptr->get_repre();
                 string repr_tour= tour_ptr->get_repre();
 
                 if(repr_roi=="\u2654" && repr_tour== "\u2656")
                 {
-                    //AFFICHAGE DEBUG
-                    cout<<"roi noir grand 3"<<endl;
                     if(roi_ptr->get_nbr_de_coup()==0 && tour_ptr->get_nbr_de_coup()==0)
                     {
-                        //AFFICHAGE DEBUG
-                        cout<<"roi noir grand 4"<<endl;
                         jouable= true;
                     }
                 }
@@ -968,29 +812,16 @@ bool Echiquier::test_roque(Coup &coup, couleur_t couleur, type_de_coup_t roque)
         }
         else if(roque== petit_roque)
         {
-            //AFFICHAGE DEBUG
-            cout<<"roi noir petit 1"<<endl;
-           
             tour_ptr= grille[0][7];
             if(roi_ptr!= NULL && tour_ptr!=NULL)
             {
-                //AFFICHAGE DEBUG
-                cout<<"roi noir petit 2"<<endl;
                 string repr_roi = roi_ptr->get_repre();
                 string repr_tour= tour_ptr->get_repre();
-                
-                //AFFICHAGE DEBUG
-                //cout<<"roi noir: "<<repr_roi<<endl;
-                //cout<<"tour noir: "<<repr_tour<<endl;
 
                 if(repr_roi=="\u2654" && repr_tour=="\u2656")
                 {
-                    //AFFICHAGE DEBUG
-                    cout<<"roi noir petit 3"<<endl;
                     if(roi_ptr->get_nbr_de_coup()==0 && tour_ptr->get_nbr_de_coup()==0)
                     {  
-                        //AFFICHAGE DEBUG
-                        cout<<"roi noir petit 4"<<endl;
                         jouable= true;
                     }
                 }
@@ -998,9 +829,6 @@ bool Echiquier::test_roque(Coup &coup, couleur_t couleur, type_de_coup_t roque)
         }
         
     }
-
-    //AFFICHAGE DEBUG
-    cout<<"fin test roque"<<endl;
 
     return jouable;  
 }
@@ -1011,19 +839,11 @@ bool Echiquier::traitement_roque(Coup &coup, couleur_t couleur)
 {
     type_de_coup_t roque= coup.get_type_de_coup();
 
-    //AFFICHAGE DEBUG
-    cout<<"roque :"<<roque<<endl;
-
-    
     bool jouable= test_roque(coup, couleur, roque);
   
     if(jouable== true)
-    {
-        //AFFICHAGE DEBUG
-        //cout<<"roque jouable"<<endl;
-
         return false;
-    } 
+
 
     else
     {
@@ -1080,17 +900,7 @@ void Echiquier::gerer_promotion(Coup &coup, Piece* piece_ptr)
     vector<int> depart= coup.get_depart_coup();
     vector<int> destination= coup.get_destination_coup();
 
-
-    //AFFICHAGE DEBUG
-    cout<<"avant init var repr"<<endl;
-    cout<<"piece_ptr :"<<piece_ptr<<endl;
-    cout<<"coord départ coup :"<<depart[0]<<","<<depart[1]<<endl;
-
-
     string repr= piece_ptr->get_repre();
-
-    //AFFICHAGE DEBUG
-    cout<<"apres init var gerer_prom"<<endl;
 
     //Si un pion noir va sur la derniere ligne avec le coup
     if(repr== "\u2659" && destination[0]==7)

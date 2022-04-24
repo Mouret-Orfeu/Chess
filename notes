@@ -35,4 +35,4 @@ vector<int> coord_pion_noir_vient_d_etre_jouer;
 
 dans la class Coup
 
--enlever les //AFFICHAGE DEBUG
+
