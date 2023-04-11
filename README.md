@@ -30,6 +30,10 @@ joue_le_coup() permet de modifier la grille de l'echiquier conformément au coup
 On trouvera donc des sous fonctions de joue_le_coup() pour gérer la prise en passant, le roque et la promotion. 
 (à noté que pour la promotion, la lettre correspondant au Cheval est N)
 
+4) POUR JOUER
+
+Pour jouer un coup écrire en minuscule la case départ et la case destination du coup, exemple: pour avancer le pion de la case e2 en e4, écrire en ligne de commande "e2e4"
+
 
 
 
